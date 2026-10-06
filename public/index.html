@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Inserimento dati cliente e informazioni del veicolo">
+  <title>Gestore tagliandi | Nuovo intervento</title>
+  <link rel="stylesheet" href="style.css">
+  
+
+</head>
+<body>
+  <section id="auth-screen" class="auth-screen" hidden>
+    <div class="auth-content">
+      <p class="eyebrow">Gestore tagliandi</p>
+      <h1 id="auth-title">Accedi al gestionale.</h1>
+      <p id="auth-description">Inserisci le credenziali del tuo account.</p>
+      <form id="login-form" class="auth-form">
+        <div class="field">
+          <label for="login-username">Nome utente</label>
+          <input type="text" id="login-username" name="username" autocomplete="username" required>
+        </div>
+        <div class="field">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" name="password" autocomplete="current-password" required>
+        </div>
+        <button type="submit">Accedi</button>
+      </form>
+      <form id="setup-form" class="auth-form" hidden>
+        <div class="field">
+          <label for="setup-display-name">Nome visualizzato</label>
+          <input type="text" id="setup-display-name" name="display_name" maxlength="100" autocomplete="name" required>
+        </div>
+        <div class="field">
+          <label for="setup-username">Nome utente</label>
+          <input type="text" id="setup-username" name="username" minlength="3" maxlength="50" autocomplete="username" required>
+        </div>
+        <div class="field">
+          <label for="setup-password">Password Admin</label>
+          <input type="password" id="setup-password" name="password" minlength="12" autocomplete="new-password" required>
+        </div>
+        <button type="submit">Crea account Admin</button>
+      </form>
+      <p id="auth-status" class="records-status" role="status" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <main id="app-page" class="page" hidden>
+    <header class="intro">
+      <div>
+        <p class="eyebrow">Gestore tagliandi</p>
+        <h1 id="page-title">Registra un nuovo intervento.</h1>
+      </div>
+      <div class="session-toolbar">
+        <p id="current-user"></p>
+        <button type="button" id="logout-button">Esci</button>
+      </div>
+    </header>
+
+    <section id="intervento-shell" class="form-shell" aria-labelledby="form-title">
+      <form id="intervento-form" action="#" method="post">
+        <div class="section">
+          <div class="section-heading">
+            <span class="section-number">01</span>
+            <h2 id="form-title">Dati utente</h2>
+          </div>
+          <div class="contact-actions">
+            <button type="button" id="show-contacts" aria-controls="contacts-panel">
+              Rubrica
+            </button>
+          </div>
+          <div id="contacts-panel" class="contact-picker" hidden>
+            <div class="records-heading">
+              <h3>Clienti registrati</h3>
+              <button type="button" id="export-contacts" disabled>Esporta in Excel</button>
+            </div>
+            <p id="contacts-status" class="records-status" role="status" aria-live="polite"></p>
+            <ul id="contacts-list" class="contacts-list"></ul>
+          </div>
+          <div class="fields">
+            <div class="field">
+              <label for="nome">Nome <span class="required" aria-hidden="true">*</span></label>
+              <input type="text" id="nome" name="nome" autocomplete="given-name" placeholder="Es. Marco" required>
+            </div>
+            <div class="field">
+              <label for="cognome">Cognome <span class="required" aria-hidden="true">*</span></label>
+              <input type="text" id="cognome" name="cognome" autocomplete="family-name" placeholder="Es. Rossi" required>
+            </div>
+            <div class="field">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" autocomplete="email" placeholder="nome@esempio.it">
+            </div>
+            <div class="field">
+              <label for="telefono">Telefono <span class="required" aria-hidden="true">*</span></label>
+              <input type="tel" id="telefono" name="telefono" autocomplete="tel" placeholder="Es. 333 1234567" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-heading">
+            <span class="section-number">02</span>
+            <h2>Informazioni veicolo</h2>
+          </div>
+          <div class="fields">
+            <div class="field">
+              <label for="targa">Targa <span class="required" aria-hidden="true">*</span></label>
+              <input type="text" id="targa" name="targa" placeholder="Es. AB123CD" maxlength="10" required>
+            </div>
+            <div class="field">
+              <label for="modello">Modello <span class="required" aria-hidden="true">*</span></label>
+              <input type="text" id="modello" name="modello" placeholder="Es. Fiat Panda 1.2" required>
+            </div>
+            <div class="field">
+              <label for="anno">Anno di immatricolazione <span class="required" aria-hidden="true">*</span></label>
+              <input type="number" id="anno" name="anno" min="1900" max="2026" placeholder="Es. 2020" required>
+            </div>
+            <div class="field">
+              <label for="chilometraggio">Chilometraggio</label>
+              <input type="number" id="chilometraggio" name="chilometraggio" min="0" placeholder="Es. 85000">
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-heading">
+            <span class="section-number">03</span>
+            <h2>Dettagli intervento</h2>
+          </div>
+          <div class="fields">
+            <div class="field">
+              <label for="intervento">Tipo di intervento <span class="required" aria-hidden="true">*</span></label>
+              <select id="intervento" name="intervento" required>
+                <option value="" selected disabled>Seleziona un intervento</option>
+                <option value="tagliando-ordinario">Tagliando ordinario</option>
+                <option value="manutenzione">Manutenzione</option>
+                <option value="revisione">Revisione</option>
+                <option value="diagnosi">Diagnosi</option>
+                <option value="riparazione">Riparazione</option>
+                <option value="altro">Altro</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="data">Data prevista <span class="required" aria-hidden="true">*</span></label>
+              <input type="date" id="data" name="data" required>
+            </div>
+            <div class="field full">
+              <label for="note">Note aggiuntive</label>
+              <textarea id="note" name="note" placeholder="Descrivi eventuali richieste o anomalie segnalate dal cliente..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <label class="checkline" for="privacy">
+            <input type="checkbox" id="privacy" name="privacy" required>
+            <span>Confermo che i dati inseriti sono corretti.</span>
+          </label>
+          <button type="submit">Salva intervento</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="records-section" class="records-section" aria-labelledby="records-title">
+      <button type="button" id="show-records" aria-controls="records-panel">
+        Visualizza tutti gli interventi
+      </button>
+      <div id="records-panel" class="form-shell records-shell" hidden>
+        <div class="records-content">
+          <div class="records-heading">
+            <h2 id="records-title">Interventi registrati</h2>
+            <button type="button" id="export-records" disabled>Esporta in Excel</button>
+          </div>
+          <p id="records-status" class="records-status" role="status" aria-live="polite"></p>
+          <div id="records-search-container" class="records-search" hidden>
+            <label for="records-search">Cerca negli interventi</label>
+            <input
+              type="search"
+              id="records-search"
+              placeholder="Nome, targa, intervento, note..."
+              autocomplete="off"
+            >
+          </div>
+          <div class="table-scroll">
+            <table id="records-table" hidden>
+              <thead>
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">Nome</th>
+                  <th scope="col">Cognome</th>
+                  <th scope="col">Email</th>
+                  <th scope="col">Telefono</th>
+                  <th scope="col">Targa</th>
+                  <th scope="col">Modello</th>
+                  <th scope="col">Anno</th>
+                  <th scope="col">Chilometraggio</th>
+                  <th scope="col">Intervento</th>
+                  <th scope="col">Data prevista</th>
+                  <th scope="col">Note</th>
+                  <th scope="col">Privacy</th>
+                  <th scope="col">Creato il</th>
+                </tr>
+              </thead>
+              <tbody id="records-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="staff-section" class="records-section" aria-labelledby="autoriparatori-title">
+        <button type="button" id="show-autoriparatori" aria-controls="autoriparatori-panel">
+          Gestisci autoriparatori
+        </button>
+        <div id="autoriparatori-panel" class="form-shell records-shell" hidden>
+          <div class="records-content">
+            <div class="records-heading">
+              <h2 id="autoriparatori-title">Autoriparatori</h2>
+              <button type="button" id="new-autoriparatore">Nuovo autoriparatore</button>
+            </div>
+            <p id="autoriparatori-status" class="records-status" role="status" aria-live="polite"></p>
+            <form id="autoriparatore-form" class="autoriparatore-form" hidden>
+              <h3 id="autoriparatore-form-title">Nuovo autoriparatore</h3>
+              <input type="hidden" name="id">
+              <div class="fields">
+                <div class="field">
+                  <label for="autoriparatore-nome">Nome</label>
+                  <input type="text" id="autoriparatore-nome" name="nome" maxlength="100" required>
+                </div>
+                <div class="field">
+                  <label for="autoriparatore-cognome">Cognome</label>
+                  <input type="text" id="autoriparatore-cognome" name="cognome" maxlength="100" required>
+                </div>
+                <div class="field">
+                  <label for="autoriparatore-qualifica">Qualifica</label>
+                  <input type="text" id="autoriparatore-qualifica" name="qualifica" maxlength="100" required>
+                </div>
+                <div class="field">
+                  <label for="autoriparatore-mansione">Mansione</label>
+                  <input type="text" id="autoriparatore-mansione" name="mansione" maxlength="100" required>
+                </div>
+              </div>
+              <div class="autoriparatore-actions">
+                <button type="submit" id="save-autoriparatore">Salva autoriparatore</button>
+                <button type="button" id="cancel-autoriparatore">Annulla</button>
+              </div>
+            </form>
+            <div class="table-scroll">
+              <table id="autoriparatori-table" hidden>
+                <thead>
+                  <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Nome</th>
+                    <th scope="col">Cognome</th>
+                    <th scope="col">Qualifica</th>
+                    <th scope="col">Mansione</th>
+                    <th scope="col">Azioni</th>
+                  </tr>
+                </thead>
+                <tbody id="autoriparatori-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    <section id="users-section" class="records-section" aria-labelledby="users-title" hidden>
+      <button type="button" id="show-users" aria-controls="users-panel">
+        Gestisci account
+      </button>
+      <div id="users-panel" class="form-shell records-shell" hidden>
+        <div class="records-content">
+          <div class="records-heading">
+            <h2 id="users-title">Account e autorizzazioni</h2>
+            <button type="button" id="new-user">Nuovo account</button>
+          </div>
+          <p id="users-status" class="records-status" role="status" aria-live="polite"></p>
+          <form id="user-form" class="user-form" hidden>
+            <h3>Nuovo account</h3>
+            <div class="fields">
+              <div class="field">
+                <label for="user-display-name">Nome visualizzato</label>
+                <input type="text" id="user-display-name" name="display_name" maxlength="100" required>
+              </div>
+              <div class="field">
+                <label for="user-username">Nome utente</label>
+                <input type="text" id="user-username" name="username" minlength="3" maxlength="50" required>
+              </div>
+              <div class="field">
+                <label for="user-role">Ruolo</label>
+                <select id="user-role" name="ruolo" required>
+                  <option value="autoriparatore">Autoriparatore</option>
+                  <option value="hr">Risorse umane</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="user-password">Password temporanea</label>
+                <input type="password" id="user-password" name="password" minlength="12" autocomplete="new-password" required>
+              </div>
+            </div>
+            <div class="autoriparatore-actions">
+              <button type="submit">Crea account</button>
+              <button type="button" id="cancel-user">Annulla</button>
+            </div>
+          </form>
+          <div class="table-scroll">
+            <table id="users-table" hidden>
+              <thead>
+                <tr>
+                  <th scope="col">Nome</th>
+                  <th scope="col">Nome utente</th>
+                  <th scope="col">Ruolo</th>
+                  <th scope="col">Stato</th>
+                  <th scope="col">Azioni</th>
+                </tr>
+              </thead>
+              <tbody id="users-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const authScreen = document.getElementById("auth-screen");
+    const authTitle = document.getElementById("auth-title");
+    const authDescription = document.getElementById("auth-description");
+    const authStatus = document.getElementById("auth-status");
+    const loginForm = document.getElementById("login-form");
+    const setupForm = document.getElementById("setup-form");
+    const appPage = document.getElementById("app-page");
+    const currentUserLabel = document.getElementById("current-user");
+    const logoutButton = document.getElementById("logout-button");
+    const usersSection = document.getElementById("users-section");
+    const showUsersButton = document.getElementById("show-users");
+    const usersPanel = document.getElementById("users-panel");
+    const usersStatus = document.getElementById("users-status");
+    const usersTable = document.getElementById("users-table");
+    const usersBody = document.getElementById("users-body");
+    const userForm = document.getElementById("user-form");
+    const newUserButton = document.getElementById("new-user");
+    const cancelUserButton = document.getElementById("cancel-user");
+    const form = document.getElementById("intervento-form");
+    const showRecordsButton = document.getElementById("show-records");
+    const recordsPanel = document.getElementById("records-panel");
+    const recordsStatus = document.getElementById("records-status");
+    const recordsTable = document.getElementById("records-table");
+    const recordsBody = document.getElementById("records-body");
+    const recordsSearchContainer = document.getElementById("records-search-container");
+    const recordsSearch = document.getElementById("records-search");
+    const exportRecordsButton = document.getElementById("export-records");
+    const showContactsButton = document.getElementById("show-contacts");
+    const contactsPanel = document.getElementById("contacts-panel");
+    const contactsStatus = document.getElementById("contacts-status");
+    const contactsList = document.getElementById("contacts-list");
+    const exportContactsButton = document.getElementById("export-contacts");
+    const showAutoriparatoriButton = document.getElementById("show-autoriparatori");
+    const autoriparatoriPanel = document.getElementById("autoriparatori-panel");
+    const autoriparatoriStatus = document.getElementById("autoriparatori-status");
+    const autoriparatoriTable = document.getElementById("autoriparatori-table");
+    const autoriparatoriBody = document.getElementById("autoriparatori-body");
+    const autoriparatoreForm = document.getElementById("autoriparatore-form");
+    const autoriparatoreFormTitle = document.getElementById("autoriparatore-form-title");
+    const newAutoriparatoreButton = document.getElementById("new-autoriparatore");
+    const cancelAutoriparatoreButton = document.getElementById("cancel-autoriparatore");
+    const recordFields = [
+      "id", "nome", "cognome", "email", "telefono", "targa", "modello",
+      "anno", "chilometraggio", "intervento", "data_prevista", "note",
+      "privacy", "created_at",
+    ];
+    let loadedRecords = [];
+    let currentUserId = null;
+
+    const roleNames = {
+      admin: "Admin",
+      autoriparatore: "Autoriparatore",
+      hr: "Risorse umane",
+    };
+
+    function applyUserAccess(user) {
+      currentUserId = user.id;
+      const isAdmin = user.ruolo === "admin";
+      const isAutoriparatore = user.ruolo === "autoriparatore";
+      const isHr = user.ruolo === "hr";
+      authScreen.hidden = true;
+      appPage.hidden = false;
+      currentUserLabel.textContent = `${user.display_name} · ${roleNames[user.ruolo]}`;
+      document.getElementById("page-title").textContent = isAdmin
+        ? "Registra un nuovo intervento."
+        : isAutoriparatore
+          ? "Interventi da consultare."
+          : "Anagrafica autoriparatori.";
+      document.getElementById("intervento-shell").hidden = !isAdmin;
+      document.getElementById("records-section").hidden = !(isAdmin || isAutoriparatore);
+      document.getElementById("staff-section").hidden = !(isAdmin || isHr);
+      usersSection.hidden = !isAdmin;
+    }
+
+    async function loadSession() {
+      authStatus.textContent = "";
+      try {
+        const response = await fetch("/api/session");
+        const session = await response.json();
+        if (!response.ok) throw new Error(session.message || "Impossibile verificare la sessione.");
+        if (session.user) {
+          applyUserAccess(session.user);
+          return;
+        }
+
+        appPage.hidden = true;
+        authScreen.hidden = false;
+        loginForm.hidden = session.setupRequired;
+        setupForm.hidden = !session.setupRequired;
+        authTitle.textContent = session.setupRequired ? "Configura l'accesso." : "Accedi al gestionale.";
+        authDescription.textContent = session.setupRequired
+          ? "Crea il primo account Admin per iniziare."
+          : "Inserisci le credenziali del tuo account.";
+      } catch (error) {
+        appPage.hidden = true;
+        authScreen.hidden = false;
+        authStatus.textContent = error.message || "Impossibile verificare la sessione.";
+      }
+    }
+
+    async function submitAuthForm(event, endpoint) {
+      event.preventDefault();
+      const authForm = event.currentTarget;
+      const submitButton = authForm.querySelector("button[type='submit']");
+      submitButton.disabled = true;
+      authStatus.textContent = "Verifica delle credenziali...";
+      try {
+        const payload = Object.fromEntries(new FormData(authForm).entries());
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message || "Autenticazione non riuscita.");
+        authForm.reset();
+        await loadSession();
+      } catch (error) {
+        authStatus.textContent = error.message || "Autenticazione non riuscita.";
+      } finally {
+        submitButton.disabled = false;
+      }
+    }
+
+    loginForm.addEventListener("submit", (event) => submitAuthForm(event, "/api/auth/login"));
+    setupForm.addEventListener("submit", (event) => submitAuthForm(event, "/api/auth/setup"));
+
+    logoutButton.addEventListener("click", async () => {
+      logoutButton.disabled = true;
+      try {
+        const response = await fetch("/api/auth/logout", { method: "POST" });
+        if (!response.ok) throw new Error("Non è stato possibile terminare la sessione.");
+        await loadSession();
+      } catch (error) {
+        currentUserLabel.textContent = error.message || "Errore durante la disconnessione.";
+      } finally {
+        logoutButton.disabled = false;
+      }
+    });
+
+    async function loadUsers() {
+      usersStatus.textContent = "Caricamento account...";
+      usersBody.replaceChildren();
+      usersTable.hidden = true;
+      try {
+        const response = await fetch("/api/users");
+        const users = await response.json();
+        if (!response.ok) throw new Error(users.message || "Errore durante il recupero degli account.");
+
+        users.forEach((user) => {
+          const row = document.createElement("tr");
+          [user.display_name, user.username, roleNames[user.ruolo], user.attivo ? "Attivo" : "Disattivato"]
+            .forEach((value) => {
+              const cell = document.createElement("td");
+              cell.textContent = value;
+              row.append(cell);
+            });
+          const actionsCell = document.createElement("td");
+          const toggleButton = document.createElement("button");
+          toggleButton.type = "button";
+          toggleButton.textContent = user.attivo ? "Disattiva" : "Riattiva";
+          toggleButton.disabled = user.id === Number(currentUserId);
+          toggleButton.addEventListener("click", async () => {
+            toggleButton.disabled = true;
+            try {
+              const updateResponse = await fetch(`/api/users/${user.id}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ attivo: !user.attivo }),
+              });
+              const result = await updateResponse.json();
+              if (!updateResponse.ok) throw new Error(result.message || "Errore durante l'aggiornamento dell'account.");
+              await loadUsers();
+            } catch (error) {
+              usersStatus.textContent = error.message || "Errore durante l'aggiornamento dell'account.";
+              toggleButton.disabled = false;
+            }
+          });
+          actionsCell.append(toggleButton);
+          row.append(actionsCell);
+          usersBody.append(row);
+        });
+        usersTable.hidden = users.length === 0;
+        usersStatus.textContent = `${users.length} account registrati.`;
+      } catch (error) {
+        usersStatus.textContent = error.message || "Errore durante il recupero degli account.";
+      }
+    }
+
+    showUsersButton.addEventListener("click", async () => {
+      usersPanel.hidden = false;
+      showUsersButton.disabled = true;
+      await loadUsers();
+      showUsersButton.disabled = false;
+    });
+
+    newUserButton.addEventListener("click", () => {
+      userForm.reset();
+      userForm.hidden = false;
+      userForm.elements.namedItem("display_name").focus();
+    });
+
+    cancelUserButton.addEventListener("click", () => {
+      userForm.reset();
+      userForm.hidden = true;
+    });
+
+    userForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const submitButton = userForm.querySelector("button[type='submit']");
+      submitButton.disabled = true;
+      usersStatus.textContent = "Creazione account...";
+      const payload = Object.fromEntries(new FormData(userForm).entries());
+      try {
+        const response = await fetch("/api/users", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message || "Errore durante la creazione dell'account.");
+        userForm.reset();
+        userForm.hidden = true;
+        await loadUsers();
+        usersStatus.textContent = "Account creato correttamente.";
+      } catch (error) {
+        usersStatus.textContent = error.message || "Errore durante la creazione dell'account.";
+      } finally {
+        submitButton.disabled = false;
+      }
+    });
+
+    loadSession();
+
+    async function loadAutoriparatori() {
+      autoriparatoriStatus.textContent = "Caricamento autoriparatori...";
+      autoriparatoriTable.hidden = true;
+      autoriparatoriBody.replaceChildren();
+
+      try {
+        const response = await fetch("/api/autoriparatori");
+        const autoriparatori = await response.json();
+        if (!response.ok) {
+          throw new Error(autoriparatori.message || "Errore durante il recupero degli autoriparatori.");
+        }
+
+        autoriparatori.forEach((autoriparatore) => {
+          const row = document.createElement("tr");
+          ["id", "nome", "cognome", "qualifica", "mansione"].forEach((field) => {
+            const cell = document.createElement("td");
+            cell.textContent = String(autoriparatore[field]);
+            row.append(cell);
+          });
+
+          const actionsCell = document.createElement("td");
+          const editButton = document.createElement("button");
+          editButton.type = "button";
+          editButton.textContent = "Modifica";
+          editButton.addEventListener("click", () => {
+            autoriparatoreForm.elements.namedItem("id").value = autoriparatore.id;
+            ["nome", "cognome", "qualifica", "mansione"].forEach((field) => {
+              autoriparatoreForm.elements.namedItem(field).value = autoriparatore[field];
+            });
+            autoriparatoreFormTitle.textContent = `Modifica ${autoriparatore.nome} ${autoriparatore.cognome}`;
+            autoriparatoreForm.hidden = false;
+            autoriparatoreForm.elements.namedItem("nome").focus();
+          });
+          actionsCell.append(editButton);
+          row.append(actionsCell);
+          autoriparatoriBody.append(row);
+        });
+
+        autoriparatoriTable.hidden = autoriparatori.length === 0;
+        autoriparatoriStatus.textContent = autoriparatori.length
+          ? `${autoriparatori.length} autoriparatori registrati.`
+          : "Nessun autoriparatore registrato.";
+      } catch (error) {
+        autoriparatoriStatus.textContent = error.message || "Errore durante il recupero degli autoriparatori.";
+      }
+    }
+
+    showAutoriparatoriButton.addEventListener("click", async () => {
+      autoriparatoriPanel.hidden = false;
+      showAutoriparatoriButton.disabled = true;
+      await loadAutoriparatori();
+      showAutoriparatoriButton.disabled = false;
+    });
+
+    newAutoriparatoreButton.addEventListener("click", () => {
+      autoriparatoreForm.reset();
+      autoriparatoreForm.elements.namedItem("id").value = "";
+      autoriparatoreFormTitle.textContent = "Nuovo autoriparatore";
+      autoriparatoreForm.hidden = false;
+      autoriparatoreForm.elements.namedItem("nome").focus();
+    });
+
+    cancelAutoriparatoreButton.addEventListener("click", () => {
+      autoriparatoreForm.reset();
+      autoriparatoreForm.hidden = true;
+    });
+
+    autoriparatoreForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const formData = new FormData(autoriparatoreForm);
+      const id = formData.get("id");
+      const payload = Object.fromEntries(
+        ["nome", "cognome", "qualifica", "mansione"].map((field) => [field, formData.get(field)])
+      );
+      const saveButton = document.getElementById("save-autoriparatore");
+      saveButton.disabled = true;
+      autoriparatoriStatus.textContent = "Salvataggio in corso...";
+
+      try {
+        const response = await fetch(id ? `/api/autoriparatori/${id}` : "/api/autoriparatori", {
+          method: id ? "PUT" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result.message || "Errore durante il salvataggio dell'autoriparatore.");
+        }
+
+        autoriparatoreForm.reset();
+        autoriparatoreForm.hidden = true;
+        await loadAutoriparatori();
+        autoriparatoriStatus.textContent = id
+          ? "Autoriparatore modificato correttamente."
+          : "Autoriparatore inserito correttamente.";
+      } catch (error) {
+        autoriparatoriStatus.textContent = error.message || "Errore durante il salvataggio dell'autoriparatore.";
+      } finally {
+        saveButton.disabled = false;
+      }
+    });
+
+    function getFilteredRecords() {
+      const query = recordsSearch.value
+        .trim()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLocaleLowerCase("it");
+      return loadedRecords.filter((record) =>
+        recordFields.some((field) => {
+          const value = field === "privacy"
+            ? (record[field] ? "Sì" : "No")
+            : record[field];
+          return String(value ?? "")
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toLocaleLowerCase("it")
+            .includes(query);
+        })
+      );
+    }
+
+    function renderRecords() {
+      const filteredRecords = getFilteredRecords();
+      recordsBody.replaceChildren();
+      filteredRecords.forEach((record) => {
+        const row = document.createElement("tr");
+        recordFields.forEach((field) => {
+          const cell = document.createElement("td");
+          const value = record[field];
+          cell.textContent = field === "privacy"
+            ? (value ? "Sì" : "No")
+            : (value == null ? "—" : String(value));
+          row.append(cell);
+        });
+        recordsBody.append(row);
+      });
+
+      recordsStatus.textContent = filteredRecords.length === loadedRecords.length
+        ? `${loadedRecords.length} interventi trovati.`
+        : `${filteredRecords.length} di ${loadedRecords.length} interventi visualizzati.`;
+    }
+
+    recordsSearch.addEventListener("input", renderRecords);
+
+    showContactsButton.addEventListener("click", async () => {
+      contactsPanel.hidden = false;
+      showContactsButton.disabled = true;
+      exportContactsButton.disabled = true;
+      contactsStatus.textContent = "Caricamento rubrica...";
+      contactsList.replaceChildren();
+
+      try {
+        const response = await fetch("/api/clienti");
+        const clients = await response.json();
+
+        if (!response.ok) {
+          throw new Error(clients.message || "Errore durante il recupero della rubrica.");
+        }
+
+        if (clients.length === 0) {
+          contactsStatus.textContent = "Non ci sono clienti registrati.";
+          return;
+        }
+
+        clients.forEach((client) => {
+          const item = document.createElement("li");
+          const details = document.createElement("span");
+          details.textContent = `${client.nome} ${client.cognome} · ${client.email || "Email non disponibile"} · ${client.telefono}`;
+
+          const selectButton = document.createElement("button");
+          selectButton.type = "button";
+          selectButton.textContent = "Usa cliente";
+          selectButton.addEventListener("click", () => {
+            form.elements.namedItem("nome").value = client.nome;
+            form.elements.namedItem("cognome").value = client.cognome;
+            form.elements.namedItem("email").value = client.email || "";
+            form.elements.namedItem("telefono").value = client.telefono;
+            contactsStatus.textContent = `Dati di ${client.nome} ${client.cognome} inseriti nel modulo.`;
+            form.elements.namedItem("targa").focus();
+          });
+
+          item.append(details, selectButton);
+          contactsList.append(item);
+        });
+
+        contactsStatus.textContent = `${clients.length} clienti in rubrica.`;
+        exportContactsButton.disabled = false;
+      } catch (error) {
+        contactsStatus.textContent = error.message || "Errore durante il recupero della rubrica.";
+      } finally {
+        showContactsButton.disabled = false;
+      }
+    });
+
+    exportContactsButton.addEventListener("click", async () => {
+      exportContactsButton.disabled = true;
+      contactsStatus.textContent = "Preparazione del file Excel...";
+
+      try {
+        const response = await fetch("/api/clienti/export");
+
+        if (!response.ok) {
+          const result = await response.json();
+          throw new Error(result.message || "Errore durante l'esportazione dei clienti.");
+        }
+
+        const file = await response.blob();
+        const downloadUrl = URL.createObjectURL(file);
+        const downloadLink = document.createElement("a");
+        downloadLink.href = downloadUrl;
+        downloadLink.download = "clienti.xlsx";
+        downloadLink.click();
+        URL.revokeObjectURL(downloadUrl);
+        contactsStatus.textContent = "File Excel dei clienti scaricato.";
+      } catch (error) {
+        contactsStatus.textContent = error.message || "Errore durante l'esportazione dei clienti.";
+      } finally {
+        exportContactsButton.disabled = contactsList.childElementCount === 0;
+      }
+    });
+
+    showRecordsButton.addEventListener("click", async () => {
+      recordsPanel.hidden = false;
+      showRecordsButton.disabled = true;
+      exportRecordsButton.disabled = true;
+      recordsSearchContainer.hidden = true;
+      recordsSearch.value = "";
+      loadedRecords = [];
+      recordsStatus.textContent = "Caricamento interventi...";
+      recordsTable.hidden = true;
+      recordsBody.replaceChildren();
+
+      try {
+        const response = await fetch("/api/interventi");
+        const records = await response.json();
+
+        if (!response.ok) {
+          throw new Error(records.message || "Errore durante il recupero degli interventi.");
+        }
+
+        if (records.length === 0) {
+          recordsStatus.textContent = "Non ci sono interventi registrati.";
+          return;
+        }
+
+        loadedRecords = records;
+        recordsSearchContainer.hidden = false;
+        recordsTable.hidden = false;
+        renderRecords();
+        exportRecordsButton.disabled = false;
+      } catch (error) {
+        recordsStatus.textContent = error.message || "Errore durante il recupero degli interventi.";
+      } finally {
+        showRecordsButton.disabled = false;
+      }
+    });
+
+    exportRecordsButton.addEventListener("click", async () => {
+      exportRecordsButton.disabled = true;
+      recordsStatus.textContent = "Preparazione del file Excel...";
+
+      try {
+        const response = await fetch("/api/interventi/export", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ids: getFilteredRecords().map((record) => record.id),
+          }),
+        });
+
+        if (!response.ok) {
+          const result = await response.json();
+          throw new Error(result.message || "Errore durante l'esportazione degli interventi.");
+        }
+
+        const file = await response.blob();
+        const downloadUrl = URL.createObjectURL(file);
+        const downloadLink = document.createElement("a");
+        downloadLink.href = downloadUrl;
+        downloadLink.download = "interventi.xlsx";
+        downloadLink.click();
+        URL.revokeObjectURL(downloadUrl);
+        recordsStatus.textContent = "File Excel scaricato.";
+      } catch (error) {
+        recordsStatus.textContent = error.message || "Errore durante l'esportazione degli interventi.";
+      } finally {
+        exportRecordsButton.disabled = recordsTable.hidden;
+      }
+    });
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const formData = new FormData(form);
+      const payload = Object.fromEntries(formData.entries());
+      payload.privacy = formData.get("privacy") === "on";
+
+      try {
+        const response = await fetch("/api/interventi", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.message || "Errore durante il salvataggio.");
+        }
+
+        alert("Intervento salvato correttamente!");
+        form.reset();
+      } catch (error) {
+        alert(error.message);
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+{
+  "name": "gestore_tagliandi",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "dev": "docker compose up -d mysql && { attempt=0; until docker exec mysql-dev mysqladmin ping -uutente -ppassword --silent; do attempt=$((attempt + 1)); if [ \"$attempt\" -ge 30 ]; then echo \"MySQL non è pronto dopo 30 secondi.\" >&2; exit 1; fi; sleep 1; done; } && node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stefanolazzari/Gestore_tagliandi.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/stefanolazzari/Gestore_tagliandi/issues"
+  },
+  "homepage": "https://github.com/stefanolazzari/Gestore_tagliandi#readme",
+  "dependencies": {
+    "dotenv": "^18.0.3",
+    "exceljs": "^4.4.0",
+    "express": "^5.2.1",
+    "mysql2": "^3.24.4"
+  },
+  "overrides": {
+    "uuid": "^11.1.1"
+  }
+}
